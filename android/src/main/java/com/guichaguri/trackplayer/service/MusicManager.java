@@ -163,6 +163,8 @@ public class MusicManager implements OnAudioFocusChangeListener {
         if(wakeLock.isHeld()) wakeLock.release();
         if(wifiLock.isHeld()) wifiLock.release();
 
+        abandonFocus();
+
         metadata.setActive(true);
     }
 
@@ -261,18 +263,18 @@ public class MusicManager implements OnAudioFocusChangeListener {
         if(manager == null) {
             r = AudioManager.AUDIOFOCUS_REQUEST_FAILED;
         } else if(Build.VERSION.SDK_INT >= 26) {
-            focus = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+            focus = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
                     .setOnAudioFocusChangeListener(this)
                     .setAudioAttributes(new AudioAttributes.Builder()
                             .setUsage(AudioAttributes.USAGE_MEDIA)
-                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                             .build())
                     .build();
 
             r = manager.requestAudioFocus(focus);
         } else {
             //noinspection deprecation
-            r = manager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+            r = manager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
         }
 
         hasAudioFocus = r == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
